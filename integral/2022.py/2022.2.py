@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 from scipy.optimize import differential_evolution
-from scipy.optimize import minimize_scalar, minimize
+from scipy.optimize import minimize_scalar
 import time
 
 #1.物理参数
@@ -39,7 +39,7 @@ def linear(c_pto_damping):
         fun=system, 
         t_span=t_span,
         y0=y0,
-        method="RK45",
+        method="BDF",
         dense_output=True, 
         rtol=1e-5, 
         atol=1e-7
@@ -79,7 +79,7 @@ def nonlinear(params):
         fun=system,
         t_span=(0.0, 40 * T),
         y0=[0.0, 0.0, 0.0, 0.0],
-        method="BDF", 
+        method="RK45", 
         dense_output=True,
         rtol=1e-4,  # 在进化算法探索期，稍微放宽容差可以大幅提速
         atol=1e-6

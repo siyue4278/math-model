@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 
 #1.物理参数
 
-m1 = 4866
-m2 = 2433
+m_float = 4866
+m_vibrator = 2433
 m_add = 1335.535
-k1 = 1025 * 9.8 * np.pi
-c1 = 656.3616
-k2 = 80000
-c2 = 10000
+k_restoring_force = 1025 * 9.8 * np.pi
+c_daming = 656.3616
+k_spring = 80000
+c_pto_line_daming = 10000
 F0 = 6250
 w = 1.4005
 T = 2 * np.pi / w
@@ -28,11 +28,11 @@ def wave_energy_systerm(t: float, state: np.ndarray) -> np.ndarray:
     dy1_dt = y3
     dy2_dt = y4
 
-    dy3_dt = (1 / (m1 + m_add)) * (
-        F_wave(t) - (k1 + k2) * y1 + k2 * y2 - (c1 + c2) * y3
-+ c2 * y4)
-    dy4_dt = (1 / m2) * (
-        k2 * y1  - k2 * y2 + c2 * y3 - c2 * y4
+    dy3_dt = (1 / (m_float + m_add)) * (
+        F_wave(t) - (k_restoring_force + k_spring) * y1 + k_spring * y2 - (c_daming + c_pto_line_daming) * y3
++ c_pto_line_daming * y4)
+    dy4_dt = (1 / m_vibrator) * (
+        k_spring * y1  - k_spring * y2 + c_pto_line_daming * y3 - c_pto_line_daming * y4
     )
     return np.array([dy1_dt, dy2_dt, dy3_dt, dy4_dt])
 
@@ -48,11 +48,11 @@ def wave_energy_systerm_nonlinear(t: float, state: np.ndarray) -> np.ndarray:
 
     F_pto = c2_nonlinear * v_rel
 
-    dy3_dt = (1 / (m1 + m_add)) * (
-        F_wave(t) - k1 * y1 - k2 * (y1 - y2) - c1 * y3 - F_pto
+    dy3_dt = (1 / (m_float + m_add)) * (
+        F_wave(t) - k_restoring_force * y1 - k_spring * (y1 - y2) - c_daming * y3 - F_pto
     )
-    dy4_dt = (1 / m2) * (
-        k2 * (y1 - y2) + F_pto
+    dy4_dt = (1 / m_vibrator) * (
+        k_spring * (y1 - y2) + F_pto
     )
     return np.array([dy1_dt, dy2_dt, dy3_dt, dy4_dt])
 #3.Runge_Kutta求解
@@ -81,8 +81,7 @@ sol_2 = solve_ivp(
 )
 #4.生成0.2秒间隔的精确数据
 
-# 绝对干净的 0.2s 间隔数据，不带任何微小的毫秒偏移
-t_target = np.arange(0.0, 40 * T, 0.2)
+t_target = np.linspace(20 * T, 40 * T, 1000)
 
 y_target_1 = sol_1.sol(t_target)
 y_target_2 = sol_2.sol(t_target)
@@ -99,11 +98,12 @@ x2_2 = y_target_2.T[:, 1]
 v1_2 = y_target_2.T[:, 2]
 v2_2 = y_target_2.T[:, 3]
 
+
 #5.导出数据
 
 import pandas as pd
 
-# 创建数据框
+#创建数据框
 df_1 = pd.DataFrame({
     '时间 t (s)': t_target,
     '浮子位移 x1 (m)': x1_1,
@@ -120,9 +120,11 @@ df_2 = pd.DataFrame({
     '振子速度 v2 (m/s)': v2_2
 })
 
-# 保存为 Excel 文件
-df_1.to_csv("result1_1.csv", index=False, encoding="utf-8-sig")
-print("数据已成功导出至csv文件!")
 
-df_2.to_csv("result1_2.csv", index=False, encoding="utf-8-sig")
-print("数据已成功导出至csv文件!")
+# 保存为 Excel 文件
+df_1.to_csv("result1_12.csv", index=False, encoding="utf-8-sig")
+print("数据已成功导出至csv文件")
+
+df_2.to_csv("result1_22.csv", index=False, encoding="utf-8-sig")
+print("数据已成功导出至csv文件")
+
